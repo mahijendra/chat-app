@@ -152,8 +152,8 @@ import {
     useMutation,
     gql, useQuery,
 } from "@apollo/client";
-import { WebSocketLink } from "@apollo/client/link/ws";
-import { Container, Row, Col, FormInput, Button } from "shards-react";
+import {WebSocketLink} from "@apollo/client/link/ws";
+import {Container, Row, Col, FormInput, Button} from "shards-react";
 
 const link = new WebSocketLink({
     uri: `ws://localhost:4000/`,
@@ -184,33 +184,40 @@ const POST_MESSAGE = gql`
     }
 `;
 
-const Messages = ({ user }) => {
-    const { data } = useSubscription(GET_MESSAGES);
+const Messages = ({user}) => {
+    const {data} = useSubscription(GET_MESSAGES);
     if (!data) {
         return null;
     }
 
     return (
         <>
-            {data.messages.map(({ id, user: messageUser, content }) => (
+            {data.messages.map(({id, user: messageUser, content}) => (
                 <div
                     style={{
                         display: "flex",
                         justifyContent: user === messageUser ? "flex-end" : "flex-start",
                         paddingBottom: "1em",
+                        paddingLeft:"20px",
                     }}
                 >
                     {user !== messageUser && (
                         <div
+                            className="bg-blue-700"
                             style={{
                                 height: 50,
                                 width: 50,
                                 marginRight: "0.5em",
-                                border: "2px solid #e5e6ea",
+                                border: "1px solid lightgrey",
                                 borderRadius: 25,
                                 textAlign: "center",
-                                fontSize: "18pt",
-                                paddingTop: 5,
+                                fontSize: "12pt",
+                                display:"flex",
+                                justifyContent:"center",
+                                alignItems:"center",
+                                color:"white",
+                                letterSpacing: "1px",
+
                             }}
                         >
                             {messageUser.slice(0, 2).toUpperCase()}
@@ -218,9 +225,14 @@ const Messages = ({ user }) => {
                     )}
                     <div
                         style={{
-                            background: user === messageUser ? "teal" : "#e5e6ea",
-                            color: user === messageUser ? "white" : "black",
-                            padding: "1em",
+                            background: user === messageUser ? "#fd7878" : "#e5e6ea",
+                            color: user === messageUser ? "#ffffff" : "black",
+                           display:"flex",
+                            alignItems:"center",
+                            justifyContent:"center",
+                            fontWeight:"normal",
+                            letterSpacing:"0.3px",
+                            padding:"0.8em",
                             borderRadius: "1em",
                             maxWidth: "60%",
                         }}
@@ -252,50 +264,54 @@ const Chat = () => {
         });
     };
     return (
-        <Container style={{ }}>
-            <Messages user={state.user} />
-            <Row>
-                <Col xs={2} style={{ padding: 0 }}>
-                    <FormInput
-                        label="User"
-                        value={state.user}
-                        onChange={(evt) =>
-                            stateSet({
-                                ...state,
-                                user: evt.target.value,
-                            })
-                        }
-                    />
-                </Col>
-                <Col xs={8}>
-                    <FormInput
-                        label="Content"
-                        value={state.content}
-                        onChange={(evt) =>
-                            stateSet({
-                                ...state,
-                                content: evt.target.value,
-                            })
-                        }
-                        onKeyUp={(evt) => {
-                            if (evt.keyCode === 13) {
-                                onSend();
+        <div className="container_wrapper">
+            <Container className="container_shadow" style={{paddingTop:"50px", paddingBottom:"50px", overflow:"scroll", paddingRight:"40px"}}>
+                <Messages user={state.user}/>
+                <Row style={{paddingLeft:"40px", paddingRight:"20px", paddingTop:"20px"}}>
+                    <Col xs={2} style={{padding: 0}}>
+                        <FormInput
+                            label="User"
+                            style={{borderStyle:"none", outline:"none", borderRadius:"20px"}}
+                            value={state.user}
+                            onChange={(evt) =>
+                                stateSet({
+                                    ...state,
+                                    user: evt.target.value,
+                                })
                             }
-                        }}
-                    />
-                </Col>
-                <Col xs={2} style={{ padding: 0 }}>
-                    <Button onClick={() => onSend()} style={{ width: "100%" }}>
-                        Send
-                    </Button>
-                </Col>
-            </Row>
-        </Container>
+                        />
+                    </Col>
+                    <Col xs={8} >
+                        <FormInput
+                            label="Content"
+                            style={{borderStyle:"none", outline:"none", borderRadius:"20px"}}
+                            value={state.content}
+                            onChange={(evt) =>
+                                stateSet({
+                                    ...state,
+                                    content: evt.target.value,
+                                })
+                            }
+                            onKeyUp={(evt) => {
+                                if (evt.keyCode === 13) {
+                                    onSend();
+                                }
+                            }}
+                        />
+                    </Col>
+                    <Col xs={2} style={{padding: 0}}>
+                        <Button onClick={() => onSend()} style={{width: "100%", }}>
+                            Send
+                        </Button>
+                    </Col>
+                </Row>
+            </Container>
+        </div>
     );
 };
 
 export default () => (
     <ApolloProvider client={client}>
-        <Chat />
+        <Chat/>
     </ApolloProvider>
 );
